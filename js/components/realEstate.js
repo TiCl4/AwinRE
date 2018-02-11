@@ -137,7 +137,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /*jshint esversion: 6 */
+
 
 var App = function (_Component) {
   _inherits(App, _Component);
@@ -152,7 +153,7 @@ var App = function (_Component) {
       listingsData: _listingsData2.default,
       city: 'All',
       homeType: 'All',
-      bedrooms: 'All',
+      bedrooms: '',
       min_price: 0,
       max_price: 10000000,
       min_floor_space: 0,
@@ -164,7 +165,8 @@ var App = function (_Component) {
       filteredData: _listingsData2.default,
       populateFormsData: '',
       sortby: 'price-dsc',
-      view: 'box'
+      view: 'box',
+      search: ''
     };
     _this.change = _this.change.bind(_this);
     _this.filteredData = _this.filteredData.bind(_this);
@@ -189,9 +191,9 @@ var App = function (_Component) {
       var _this2 = this;
 
       var name = event.target.name;
-      var value = event.target.type == 'checkbox' ? event.target.checked : event.target.value;
+      var value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
       this.setState(_defineProperty({}, name, value), function () {
-        console.log(_this2.state);
+        // console.log(this.state)
         _this2.filteredData();
       });
     }
@@ -211,21 +213,15 @@ var App = function (_Component) {
         return item.price >= _this3.state.min_price && item.price <= _this3.state.max_price && item.floorSpace >= _this3.state.min_floor_space && item.floorSpace <= _this3.state.max_floor_space && item.rooms >= _this3.state.bedrooms;
       });
 
-      if (this.state.city != "All") {
+      if (this.state.city != 'All') {
         newData = newData.filter(function (item) {
           return item.city == _this3.state.city;
         });
       }
 
-      if (this.state.homeType != "All") {
+      if (this.state.homeType != 'All') {
         newData = newData.filter(function (item) {
           return item.homeType == _this3.state.homeType;
-        });
-      }
-
-      if (this.state.bedrooms != "All") {
-        newData = newData.filter(function (item) {
-          return item.rooms == _this3.state.bedrooms;
         });
       }
 
@@ -240,6 +236,18 @@ var App = function (_Component) {
         });
       }
 
+      if (this.state.search != '') {
+        newData = newData.filter(function (item) {
+          var city = item.city.toLowerCase();
+          var searchText = _this3.state.search.toLowerCase();
+          var n = city.match(searchText);
+
+          if (n != null) {
+            return true;
+          }
+        });
+      }
+
       this.setState({
         filteredData: newData
       });
@@ -247,8 +255,6 @@ var App = function (_Component) {
   }, {
     key: 'populateForms',
     value: function populateForms() {
-      var _this4 = this;
-
       //city
       var cities = this.state.listingsData.map(function (item) {
         return item.city;
@@ -279,8 +285,6 @@ var App = function (_Component) {
           homeTypes: homeTypes,
           bedrooms: bedrooms
         }
-      }, function () {
-        console.log(_this4.state.populateFormsData);
       });
     }
   }, {
@@ -294,7 +298,7 @@ var App = function (_Component) {
           'section',
           { id: 'content-area' },
           _react2.default.createElement(_Filter2.default, { change: this.change, globalState: this.state, populateAction: this.populateForms }),
-          _react2.default.createElement(_Listings2.default, { listingsData: this.state.filteredData, change: this.change, globalState: this.state, changeView: this.changeView })
+          _react2.default.createElement(_Listings2.default, { change: this.change, globalState: this.state, listingsData: this.state.filteredData, changeView: this.changeView })
         )
       );
     }
@@ -331,7 +335,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /*jshint esversion: 6 */
+
 
 var Filter = function (_Component) {
   _inherits(Filter, _Component);
@@ -453,11 +458,6 @@ var Filter = function (_Component) {
           _react2.default.createElement(
             'select',
             { name: 'bedrooms', className: 'filters bedrooms', onChange: this.props.change },
-            _react2.default.createElement(
-              'option',
-              { value: 'All' },
-              '0+ BR'
-            ),
             this.bedrooms()
           ),
           _react2.default.createElement(
@@ -888,7 +888,7 @@ var Listings = function (_Component) {
         _react2.default.createElement(
           'section',
           { className: 'search-area' },
-          _react2.default.createElement('input', { type: 'text', name: 'search' })
+          _react2.default.createElement('input', { type: 'text', name: 'search', onChange: this.props.change })
         ),
         _react2.default.createElement(
           'section',
@@ -896,7 +896,8 @@ var Listings = function (_Component) {
           _react2.default.createElement(
             'div',
             { className: 'results' },
-            ' 390 results found'
+            this.props.globalState.filteredData.length,
+            ' results found'
           ),
           _react2.default.createElement(
             'div',
